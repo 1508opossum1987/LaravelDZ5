@@ -2,14 +2,12 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\Brand\BrandStoreRequest;
 use App\Http\Requests\Product\ProductStoreRequest;
 use App\Models\Brand;
 use App\Models\Category;
 use App\Models\Country;
 use App\Models\Product;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Str;
 use Illuminate\View\View;
@@ -124,6 +122,7 @@ class ProductController extends Controller
                 File::delete($filePath);
             }
         }
+
 
         return redirect()
             ->route('products.index')

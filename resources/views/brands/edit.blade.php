@@ -11,7 +11,7 @@
             </div>
 
             <div class="bg-gray-900 rounded-lg p-6">
-                <form action="{{ route('brands.update', $brand) }}" method="POST">
+                <form action="{{ route('brands.update', $brand) }}" method="POST" enctype="multipart/form-data">
                     @csrf
                     @method('PUT')
 
@@ -28,6 +28,22 @@
                         @enderror
                     </div>
 
+                    @if($brand->image)
+                        <div class="mb-6">
+                            <img src="{{ asset('storage/' . $brand->image->url) }}" width="620  " height="350" alt="">
+                        </div>
+                    @endif
+                    <div class="mb-6">
+                        <label for="img_path" class="block text-white mb-2">Изображение товара</label>
+                        <input type="file"
+                               name="img_path"
+                               id="img_path"
+                               accept="image/*"
+                               class="w-full bg-gray-800 text-white border border-gray-700 rounded-lg px-4 py-2 focus:outline-none focus:border-blue-500 @error('img_path') border-red-500 @enderror">
+                        @error('img_path')
+                        <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                        @enderror
+                    </div>
                     <div class="mb-6">
                         <label class="flex items-center gap-2 cursor-pointer">
                             <input type="checkbox"

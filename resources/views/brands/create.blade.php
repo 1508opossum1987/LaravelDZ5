@@ -11,7 +11,7 @@
             </div>
 
             <div class="bg-gray-900 rounded-lg p-6">
-                <form action="{{ route('brands.store') }}" method="POST">
+                <form action="{{ route('brands.store') }}" method="POST" enctype="multipart/form-data">>
                     @csrf
 
                     <div class="mb-4">
@@ -23,6 +23,18 @@
                                class="w-full bg-gray-800 text-white border border-gray-700 rounded-lg px-4 py-2 focus:outline-none focus:border-blue-500 @error('name') border-red-500 @enderror"
                                required>
                         @error('name')
+                        <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                        @enderror
+                    </div>
+
+                    <div class="mb-4">
+                        <label for="img_path" class="block text-white mb-2">Изображение товара</label>
+                        <input type="file"
+                               name="img_path"
+                               id="img_path"
+                               accept="image/*"
+                               class="w-full bg-gray-800 text-white border border-gray-700 rounded-lg px-4 py-2 focus:outline-none focus:border-blue-500 @error('img_path') border-red-500 @enderror">
+                        @error('img_path')
                         <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
                         @enderror
                     </div>

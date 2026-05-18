@@ -2,8 +2,10 @@
 
 namespace App\Models;
 
+use App\Traits\Filters;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\MorphOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 /**
@@ -14,12 +16,17 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 class Country extends Model
 {
 
-    use SoftDeletes;
+    use SoftDeletes, Filters;
 
     protected $fillable = ['name', 'active'];
 
     public function products(): HasMany
     {
         return $this->hasMany(Product::class);
+    }
+
+    public function image(): MorphOne
+    {
+        return $this->morphOne(Image::class, 'imageable');
     }
 }
