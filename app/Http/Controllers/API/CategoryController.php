@@ -14,6 +14,7 @@ class CategoryController extends Controller
     public function index(Request $request): AnonymousResourceCollection
     {
         $categories = Category::query()->paginate($request->get('per_page',10));
+
         return CategoryResource::collection($categories);
     }
 }
