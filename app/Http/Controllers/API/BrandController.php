@@ -127,7 +127,8 @@ class BrandController extends Controller
 
     public function forceDestroy($id)
     {
-        $brand = Brand::onlyTrashed()->findOrFail($id);
+        $brand = Brand::onlyTrashed()
+            ->findOrFail($id);
 
         $brand->forceDelete();
 
@@ -135,5 +136,13 @@ class BrandController extends Controller
             'data' => new BrandResource($brand),
             'message' => "Бренд '{$brand->name}' успешно удален без возможности восстановления"],
             Response::HTTP_OK);
+    }
+
+    public function trashed(Request $request): AnonymousResourceCollection
+    {
+        $query = Brand::onlyTrashed()
+            ->sortable($request);
+
+        return BrandResource::collection($query->paginate($request->get('per_page', 10)));
     }
 }

@@ -12,17 +12,19 @@ use Illuminate\Support\Facades\Route;
 
 // API/BRAND CONTROLLER
 Route::prefix('brands')->group(function () {
+    Route::get('trashed', [BrandController::class, 'trashed']);
     Route::get('', [BrandController::class, 'index']);
     Route::post('', [BrandController::class, 'store']);
-    Route::delete('{id}',[BrandController::class, 'destroy']);
-    Route::delete('', [BrandController::class, 'destroy']);
+    Route::get('{id}',[BrandController::class,'show']);
     Route::put('',[BrandController::class,'update']);
     Route::put('{id}',[BrandController::class,'update']);
     Route::patch('',[BrandController::class,'update']);
     Route::patch('{id}',[BrandController::class,'update']);
-    Route::get('{id}',[BrandController::class,'show']);
+    Route::delete('', [BrandController::class, 'destroy']);
+    Route::delete('{id}',[BrandController::class, 'destroy']);
     Route::patch('{id}/restore',[BrandController::class,'restore']);
     Route::delete('{id}/forceDestroy', [BrandController::class, 'forceDestroy']);
+
 });
 
 Route::prefix('countries')->group(function () {
