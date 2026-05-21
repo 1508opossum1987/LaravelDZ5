@@ -13,7 +13,8 @@ class BrandController extends Controller
 {
     public function index(Request $request): AnonymousResourceCollection
     {
-        $query = Brand::filter($request);
+        $query = Brand::filter($request)
+            ->sortable($request);
 
         return BrandResource::collection($query->paginate($request->get('per_page', 10)));
     }
@@ -30,40 +31,23 @@ class BrandController extends Controller
         return response()->json(['data' => $brand], Response::HTTP_CREATED);
     }
 
-    public function destroyByName(Request $request)
+    public function destroy(Request $request, $id = null)
     {
-        $brandName = $request->query('name');
-
-        if (!$brandName) {
-            return response()->json([
-                'message' => 'Не указано имя бренда'
-            ], Response::HTTP_BAD_REQUEST);
+        if ($id) {
+            $brand = Brand::find($id);
         }
 
-        $brand = Brand::where('name', $brandName)->first();
+        else {
+            $brandName = $request->query('name');
 
-        if (!$brand) {
-            return response()->json([
-                'message' => "Бренд '{$brandName}' не найден!"
-            ], Response::HTTP_NOT_FOUND);
+            if (!$brandName) {
+                return response()->json([
+                    'message' => 'Не указано имя бренда'
+                ], Response::HTTP_BAD_REQUEST);
+            }
+
+            $brand = Brand::where('name', $brandName)->first();
         }
-
-        if ($brand->products()->exists()) {
-            return response()->json([
-                'message' => "Нельзя удалить бренд '{$brandName}', так как у него есть товары!"
-            ], Response::HTTP_CONFLICT);
-        }
-
-        $brand->delete();
-
-        return response()->json([
-            'message' => "Бренд '{$brandName}' успешно удален!"
-        ], Response::HTTP_OK);
-    }
-
-    public function destroyById($id)
-    {
-        $brand = Brand::find($id);
 
         if (!$brand) {
             return response()->json([
@@ -77,11 +61,12 @@ class BrandController extends Controller
             ], Response::HTTP_CONFLICT);
         }
 
-        $brandName = $brand->name;
         $brand->delete();
 
         return response()->json([
-            'message' => "Бренд '{$brandName}' успешно удален!"
+            'message' => "Бренд '{$brand->name}' успешно удален!"
         ], Response::HTTP_OK);
     }
+
+
 }

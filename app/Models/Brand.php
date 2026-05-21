@@ -15,7 +15,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  */
 class Brand extends Model
 {
-    use SoftDeletes, Filters;
+    use SoftDeletes, Filters, Sortable;
 
     protected $fillable = ['name', 'active'];
 
