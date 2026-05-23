@@ -2,12 +2,15 @@
 
 namespace App\Models;
 
+use App\Traits\Filters;
+use App\Traits\Sortable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\File;
+use Illuminate\Support\Str;
 
 /**
  * @property int $id
@@ -24,7 +27,7 @@ use Illuminate\Support\Facades\File;
  */
 class Product extends Model
 {
-    use HasFactory, SoftDeletes;
+    use HasFactory, SoftDeletes, Filters, Sortable;
 
     protected $fillable = [
         'category_id',
@@ -52,5 +55,11 @@ class Product extends Model
     public function country(): belongsTo
     {
         return $this->belongsTo(Country::class);
+    }
+
+    public function setNameAttribute($value)
+    {
+        $this->attributes['name'] = $value;
+        $this->attributes['slug'] = Str::slug($value);
     }
 }
