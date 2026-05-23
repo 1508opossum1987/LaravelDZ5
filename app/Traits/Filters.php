@@ -5,6 +5,10 @@ namespace App\Traits;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 
+/**
+ * @method static Builder filter ($request)
+ */
+
 trait Filters
 {
     public function scopeFilter(

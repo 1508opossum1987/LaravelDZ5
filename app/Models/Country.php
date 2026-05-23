@@ -13,7 +13,28 @@ use Illuminate\Support\Str;
 /**
  * @property int $id
  * @property string $name
- * @property bool $active
+ * @property int $active
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property \Illuminate\Support\Carbon|null $deleted_at
+ * @property-read \App\Models\Image|null $image
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Product> $products
+ * @property-read int|null $products_count
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Country filter(\Illuminate\Http\Request $request)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Country newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Country newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Country onlyTrashed()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Country query()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Country sortable(\Illuminate\Http\Request $request)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Country whereActive($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Country whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Country whereDeletedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Country whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Country whereName($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Country whereUpdatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Country withTrashed(bool $withTrashed = true)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Country withoutTrashed()
+ * @mixin \Eloquent
  */
 class Country extends Model
 {
@@ -35,6 +56,5 @@ class Country extends Model
     public function setNameAttribute($value)
     {
         $this->attributes['name'] = $value;
-        $this->attributes['slug'] = Str::slug($value);
     }
 }

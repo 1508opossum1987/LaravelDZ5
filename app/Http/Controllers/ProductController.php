@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Events\ProductCreateEvent;
 use App\Http\Requests\Product\ProductStoreRequest;
 use App\Models\Brand;
 use App\Models\Category;
@@ -59,6 +60,12 @@ class ProductController extends Controller
                 File::delete('storage/' . $validated['img_path']);
             }
         }
+
+        event (new ProductCreateEvent(
+            $user,
+            $product,
+            'Created'
+        ))
 
         return redirect()
             ->route('products.index')

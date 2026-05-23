@@ -2,7 +2,7 @@
 
 @section('content')
     <div class="container mx-auto px-4 py-8">
-        @if (auth()->user()->isAdmin())
+        @if (auth()->user()?->isAdmin())
             <div class="flex justify-between items-center mb-6">
                 <h1 class="text-3xl font-bold text-white">Категории</h1>
                 <a href="{{ route('categories.create') }}"
@@ -58,7 +58,7 @@
                                     Подробнее →
                                 </a>
 
-                                @if(auth()->user()->isAdmin())
+                                @if(auth()->user()?->isAdmin())
                                     <div class="flex gap-2">
                                         <a href="{{ route('categories.edit', $category) }}"
                                            class="text-yellow-400 hover:text-yellow-300 text-sm">
@@ -87,7 +87,7 @@
             </div>
         </div>
 
-        @if(auth()->user()->isAdmin()&&$trashedCategories->count() > 0)
+        @if(auth()->user()?->isAdmin()&&$trashedCategories->count() > 0)
             <div>
                 <h2 class="text-2xl font-bold text-white mb-4">Корзина (удаленные категории)</h2>
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
