@@ -20,20 +20,14 @@ class ProductCreateEvent
      * Create a new event instance.
      */
     public function __construct(
-        protected User $user,
-        protected Product $product,
-        protected string $title,
-        protected string $message
+        public User $user,
+        public string $title,
+        public string $message
     )
     {
         //
     }
 
-    /**
-     * Get the channels the event should broadcast on.
-     *
-     * @return array<int, Channel>
-     */
     public function broadcastOn(): array
     {
         return [

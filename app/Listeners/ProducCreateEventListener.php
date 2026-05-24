@@ -2,6 +2,8 @@
 
 namespace App\Listeners;
 
+use App\Events\ProductCreateEvent;
+use App\Models\Notification;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Queue\InteractsWithQueue;
 
@@ -18,8 +20,12 @@ class ProducCreateEventListener
     /**
      * Handle the event.
      */
-    public function handle(object $event): void
+    public function handle(ProductCreateEvent $event): void
     {
-        //
+        Notification::query()->create([
+            'title'=>$event->title,
+            'message'=>$event->message,
+            'user_id'=>$event->user->id
+        ]);
     }
 }

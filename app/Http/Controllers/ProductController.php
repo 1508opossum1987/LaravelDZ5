@@ -9,6 +9,7 @@ use App\Models\Category;
 use App\Models\Country;
 use App\Models\Product;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Str;
 use Illuminate\View\View;
@@ -53,6 +54,13 @@ class ProductController extends Controller
         }
         try {
             $product = Product::query()->create($validated);
+            $user = \Auth::user();
+
+            event(new ProductCreateEvent(
+                $user,
+                $product,
+                'Created Product ' . $product->name
+            ));
         } catch (\Exception $exception) {
             if (
                 $productStoreRequest->hasFile('img_path') &&
@@ -60,12 +68,6 @@ class ProductController extends Controller
                 File::delete('storage/' . $validated['img_path']);
             }
         }
-
-        event (new ProductCreateEvent(
-            $user,
-            $product,
-            'Created'
-        ))
 
         return redirect()
             ->route('products.index')
@@ -81,7 +83,13 @@ class ProductController extends Controller
 
     public function edit(Product $product): View
     {
-        $categories = Category::where('active', true)->orderBy('name')->get();
+        Cache::forget('categories');
+        if (Cache::has('categories')) {
+            $categories = Cache::get('categories');
+        } else {
+            $categories = Category::where('active', true)->orderBy('name')->get()->toArray();
+            Cache::put('categories', $categories, 60 * 24);
+        }
         $brands = Brand::where('active', true)->orderBy('name')->get();
         $countries = Country::where('active', true)->orderBy('name')->get();
 
