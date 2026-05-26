@@ -45,7 +45,7 @@ class Country extends Model
 
     public function products(): HasMany
     {
-        return $this->hasMany(Product::class);
+        return $this->hasMany(Product::class, 'product_id');
     }
 
     public function image(): MorphOne

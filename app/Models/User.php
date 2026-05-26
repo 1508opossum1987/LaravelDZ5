@@ -8,6 +8,7 @@ use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Hidden;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
@@ -39,8 +40,6 @@ use Illuminate\Notifications\Notifiable;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|User whereRole($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|User whereUpdatedAt($value)
  * @mixin \Eloquent
- * @property string $role
- * @property bool $isActive
  */
 #[Fillable(['name', 'email', 'password', 'role', 'is_active'])]
 #[Hidden(['password', 'remember_token'])]
@@ -91,5 +90,20 @@ class User extends Authenticatable implements MustVerifyEmail
     public function canManageProducts(): bool
     {
         return $this->role === 'manager' || $this->role === 'admin';
+    }
+
+    public function basket (): HasMany
+    {
+        return $this->hasMany(Basket::class, 'user_id');
+    }
+
+    public function activeBasket(): ?Basket
+    {
+        return $this->baskets()->where('status', 'pending')->latest()->first();
+    }
+
+    public function completedBaskets()
+    {
+        return $this->baskets()->where('status', 'completed')->latest()->get();
     }
 }

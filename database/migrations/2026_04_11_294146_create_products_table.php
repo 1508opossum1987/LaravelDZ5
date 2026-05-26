@@ -25,15 +25,11 @@ return new class extends Migration
             $table->decimal('price', 10, 2); // обычная цена
             $table->decimal('discount_price', 10, 2)->nullable(); // цена со скидкой
             $table->decimal('price_from', 10, 2)->nullable(); // "от"
-
-
             $table->timestamps();
+            $table->integer('stock_quantity')->default(0);
         });
     }
 
-    /**
-     * Reverse the migrations.
-     */
     public function down(): void
     {
         Schema::dropIfExists('products');

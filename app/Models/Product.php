@@ -20,6 +20,7 @@ use Illuminate\Support\Str;
  * @property string $name
  * @property string|null $description
  * @property int $active
+ * @property int $stock_quantity
  * @property string|null $img_path
  * @property numeric $price
  * @property numeric|null $discount_price
@@ -69,27 +70,33 @@ class Product extends Model
         'img_path',
         'price',
         'discount_price',
-        'price_from'
+        'price_from',
+        'stock_quantity'
     ];
 
     public function category(): belongsTo
     {
-        return $this->belongsTo(Category::class);
+        return $this->belongsTo(Category::class, 'category_id');
     }
 
     public function brand(): belongsTo
     {
-        return $this->belongsTo(Brand::class);
+        return $this->belongsTo(Brand::class, 'brand_id');
     }
 
     public function country(): belongsTo
     {
-        return $this->belongsTo(Country::class);
+        return $this->belongsTo(Country::class, 'country_id');
     }
 
     public function setNameAttribute($value)
     {
         $this->attributes['name'] = $value;
         //$this->attributes['slug'] = Str::slug($value);
+    }
+
+    public function basketItem(): HasMany
+    {
+        return $this->hasMany(BasketItem::class, 'product_id');
     }
 }
