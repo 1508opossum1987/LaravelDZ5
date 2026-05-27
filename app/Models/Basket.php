@@ -18,10 +18,10 @@ class Basket extends Model
 
     public function user(): BelongsTo
     {
-        return $this->BelongsTo(User:: class, 'user_id');
+        return $this->belongsTo(User:: class, 'user_id');
     }
 
-    public function basketItem(): HasMany
+    public function items(): HasMany
     {
         return $this->hasMany(BasketItem::class, 'basket_id');
     }

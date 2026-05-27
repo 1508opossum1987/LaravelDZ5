@@ -95,8 +95,23 @@ class Product extends Model
         //$this->attributes['slug'] = Str::slug($value);
     }
 
-    public function basketItem(): HasMany
+    public function basketItems(): HasMany
     {
         return $this->hasMany(BasketItem::class, 'product_id');
+    }
+
+    public function hasStock(int $quantity): bool
+    {
+        return $this->stock_quantity >= $quantity;
+    }
+
+    public function decrementStock(int $quantity): bool
+    {
+        if (!$this->hasStock($quantity)) {
+            return false;
+        }
+
+        $this->decrement('stock_quantity', $quantity);
+        return true;
     }
 }

@@ -18,12 +18,12 @@ class BasketItem extends Model
 
     public function basket(): BelongsTo
     {
-        return $this->BelongsTo(Basket::class, 'basket_id');
+        return $this->belongsTo(Basket::class, 'basket_id');
     }
 
     public function product(): BelongsTo
     {
-        return $this->BelongsTo(Product::class, 'product_id');
+        return $this->belongsTo(Product::class, 'product_id');
     }
 
     public function subtotal(): float
