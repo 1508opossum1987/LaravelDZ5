@@ -86,10 +86,11 @@
                                 class="w-full bg-gray-800 text-white border border-gray-700 rounded-lg px-4 py-2 focus:outline-none focus:border-blue-500 @error('category_id') border-red-500 @enderror"
                                 required>
                             <option value="">Выберите категорию</option>
+
                             @foreach($categories as $category)
                                 <option
-                                    value="{{ $category->id }}" {{ old('category_id', $product->category_id) == $category->id ? 'selected' : '' }}>
-                                    {{ $category->name }}
+                                    value="{{ $category['id'] }}" {{ old('category_id', $product->category_id) == $category['id'] ? 'selected' : '' }}>
+                                    {{ $category['name'] }}
                                 </option>
                             @endforeach
                         </select>

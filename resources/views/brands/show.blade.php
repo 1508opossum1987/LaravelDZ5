@@ -19,7 +19,7 @@
                     </p>
                 </div>
 
-                @if(auth()->user()?->isAdmin())
+                @if(auth()->user()->isAdmin())
                     <a href="{{ route('brands.edit', $brand) }}"
                        class="bg-yellow-600 hover:bg-yellow-700 text-white font-bold py-2 px-4 rounded-lg transition">
                         Редактировать
