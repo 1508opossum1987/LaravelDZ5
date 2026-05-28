@@ -92,18 +92,18 @@ class User extends Authenticatable implements MustVerifyEmail
         return $this->role === 'manager' || $this->role === 'admin';
     }
 
-    public function basket(): HasMany
+    public function baskets(): HasMany
     {
         return $this->hasMany(Basket::class);
     }
 
     public function activeBasket(): ?Basket
     {
-        return $this->baskets()->where('status', 'pending')->latest()->first();
+        return $this->basket()->where('status', 'pending')->latest()->first();
     }
 
     public function completedBaskets(): HasMany
     {
-        return $this->baskets()->where('status', 'completed')->latest()->get();
+        return $this->basket()->where('status', 'completed')->latest();
     }
 }

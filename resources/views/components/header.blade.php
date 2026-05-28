@@ -4,15 +4,16 @@
 
         <!-- Верхняя строка -->
         <div class="flex items-center justify-between h-20">
-            @if(auth()->check()&&auth()->user()->isAdmin())
+            @if(auth()->check() && auth()->user()->isAdmin())
                 <a href="{{ route('admin.users.index') }}"
                    class="bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded-lg transition">
                     👥 Пользователи
                 </a>
             @endif
+
             <!-- Логотип -->
             <div class="flex items-center">
-                <a href="#" class="flex items-center gap-x-3 group">
+                <a href="{{ route('home') }}" class="flex items-center gap-x-3 group">
                     <div
                         class="w-12 h-12 bg-gradient-to-r from-orange-500 to-pink-500 rounded-2xl flex items-center justify-center text-white font-black text-2xl shadow-lg group-hover:shadow-xl transition-all">
                         E
@@ -27,7 +28,7 @@
 
             <!-- Поиск -->
             <div class="flex-1 max-w-xl mx-10">
-                <form action="#" method="GET">
+                <form action="{{ route('home') }}" method="GET">
                     <div class="relative">
                         <input
                             type="text"
@@ -52,6 +53,7 @@
 
             <!-- Иконки -->
             <div class="flex items-center gap-x-4">
+                <!-- Избранное (заглушка) -->
                 <a href="#" class="relative bg-gray-50 p-2.5 rounded-2xl hover:bg-orange-50 transition-all group">
                     <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 text-gray-600 group-hover:text-orange-500"
                          fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -62,20 +64,26 @@
                         class="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-bold w-5 h-5 flex items-center justify-center rounded-full">12</span>
                 </a>
 
-                <a href="#" class="relative bg-gray-50 p-2.5 rounded-2xl hover:bg-orange-50 transition-all group">
+                <!-- Корзина -->
+                <a href="{{ route('basket.index') }}" class="relative bg-gray-50 p-2.5 rounded-2xl hover:bg-orange-50 transition-all group">
                     <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 text-gray-600 group-hover:text-orange-500"
                          fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                               d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"/>
                     </svg>
                     <span id="cart-count"
-                          class="absolute -top-1 -right-1 bg-gradient-to-r from-orange-500 to-pink-500 text-white text-[10px] font-bold w-5 h-5 flex items-center justify-center rounded-full">0</span>
+                          class="absolute -top-1 -right-1 bg-gradient-to-r from-orange-500 to-pink-500 text-white text-[10px] font-bold w-5 h-5 flex items-center justify-center rounded-full">
+                        @auth
+                            {{ auth()->user()->activeBasket()?->totalItems() ?? 0 }}
+                        @else
+                            0
+                        @endauth
+                    </span>
                 </a>
 
                 <!-- Auth Section -->
                 <div class="flex items-center gap-x-3">
                     @guest
-                        <!-- Не авторизован -->
                         <a href="{{ route('login') }}"
                            class="flex items-center gap-x-2 bg-gray-50 hover:bg-orange-50 px-5 py-2.5 rounded-2xl transition-all group">
                             <svg xmlns="http://www.w3.org/2000/svg"
@@ -84,19 +92,16 @@
                                 <path stroke-linecap="round" stroke-linejoin="round"
                                       d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7"/>
                             </svg>
-                            <span
-                                class="hidden sm:block text-sm font-semibold text-gray-700 group-hover:text-orange-500">
-                Войти
-            </span>
+                            <span class="hidden sm:block text-sm font-semibold text-gray-700 group-hover:text-orange-500">
+                                Войти
+                            </span>
                         </a>
 
                         <a href="{{ route('register') }}"
                            class="flex items-center gap-x-2 bg-black text-white hover:bg-zinc-800 px-6 py-2.5 rounded-2xl transition-all font-semibold text-sm">
                             Регистрация
                         </a>
-
                     @else
-                        <!-- Авторизован -->
                         <div class="relative">
                             <button id="user-menu-button"
                                     onclick="toggleUserDropdown()"
@@ -107,8 +112,8 @@
                                           d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7"/>
                                 </svg>
                                 <span class="hidden sm:block text-sm font-semibold text-gray-700">
-                    {{ Auth::user()->name }}
-                </span>
+                                    {{ Auth::user()->name }}
+                                </span>
                                 <svg xmlns="http://www.w3.org/2000/svg"
                                      class="w-4 h-4 text-gray-500 transition-transform duration-200" fill="none"
                                      viewBox="0 0 24 24" stroke="currentColor">
@@ -117,10 +122,8 @@
                                 </svg>
                             </button>
 
-                            <!-- Дропдаун -->
                             <div id="user-dropdown"
-                                 class="hidden absolute right-0 mt-3 w-56 bg-white rounded-3xl shadow-2xl border border-zinc-100 py-2 z-50 overflow-hidden">
-
+                                 class="hidden absolute right-0 mt-3 w-64 bg-white rounded-3xl shadow-2xl border border-zinc-100 py-2 z-50 overflow-hidden">
                                 <div class="px-6 py-4 border-b border-zinc-100">
                                     <p class="font-semibold text-black">{{ Auth::user()->name }}</p>
                                     <p class="text-xs text-zinc-500 mt-0.5">{{ Auth::user()->email }}</p>
@@ -129,20 +132,55 @@
                                     </p>
                                 </div>
 
+                                <a href="{{ route('my-orders.index') }}"
+                                   class="flex items-center gap-x-3 px-6 py-3.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-gray-500" fill="none"
+                                         viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                              d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/>
+                                    </svg>
+                                    Мои заказы
+                                </a>
+
+                                @if(Auth::user()->isAdmin())
+                                    <a href="{{ route('admin.orders.index') }}"
+                                       class="flex items-center gap-x-3 px-6 py-3.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-gray-500" fill="none"
+                                             viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                  d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
+                                        </svg>
+                                        Управление заказами
+                                    </a>
+                                @endif
+
+                                @if(Auth::user()->canManageProducts())
+                                    <a href="{{ route('products.create') }}"
+                                       class="flex items-center gap-x-3 px-6 py-3.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-gray-500" fill="none"
+                                             viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                  d="M12 4v16m8-8H4"/>
+                                        </svg>
+                                        Добавить товар
+                                    </a>
+                                @endif
+
+                                <div class="border-t border-zinc-100 mt-1"></div>
+
                                 <a href="#"
                                    onclick="event.preventDefault(); document.getElementById('logout-form').submit();"
                                    class="flex items-center gap-x-3 px-6 py-3.5 text-sm text-red-600 hover:bg-red-50 transition-colors">
                                     <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none"
                                          viewBox="0 0 24 24" stroke="currentColor">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                              d="M17 16l4-4m0 0l-4-4m4 4V7m-4 4V7"/>
+                                              d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
                                     </svg>
                                     Выйти
                                 </a>
                             </div>
                         </div>
 
-                        <!-- Форма выхода -->
                         <form id="logout-form" action="{{ route('logout') }}" method="POST" class="hidden">
                             @csrf
                         </form>
@@ -150,76 +188,6 @@
                 </div>
             </div>
         </div>
-
-        <!-- Навигация с категориями -->
-        <nav class="border-t border-gray-100 mt-2">
-            <div class="flex items-center h-12">
-
-                <!-- Кнопка категорий -->
-                <div class="relative group">
-                    <button
-                        class="flex items-center gap-x-2 px-6 h-12 bg-gradient-to-r from-orange-500 to-pink-500 text-white font-bold text-sm rounded-xl hover:shadow-lg transition-all">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24"
-                             stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                  d="M4 6h16M4 12h16M4 18h16"/>
-                        </svg>
-                        <span>ALL CATEGORIES</span>
-                        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24"
-                             stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M19 9l-7 7-7-7"/>
-                        </svg>
-                    </button>
-
-                    <!-- Mega Dropdown -->
-                    <div
-                        class="absolute left-0 top-full hidden group-hover:block w-screen max-w-7xl bg-white shadow-2xl rounded-2xl mt-2 z-50">
-                        <div class="grid grid-cols-4 gap-6 p-8">
-                            @foreach($navigationCategories as $category)
-                                <div>
-                                    <a href="#"
-                                       class="block font-bold text-gray-900 hover:text-orange-500 mb-4 text-base">
-                                        🎯 {{ $category->name }}
-                                    </a>
-                                    <ul class="space-y-2">
-                                        @foreach($category->children as $child)
-                                            <li>
-                                                <a href="{{ route('categories.category.products', $category->id) }}"
-                                                   class="text-gray-500 hover:text-gray-900 text-sm transition block hover:pl-2">
-                                                    {{ $child->name }}
-                                                </a>
-                                            </li>
-                                        @endforeach
-                                    </ul>
-                                </div>
-                            @endforeach
-                        </div>
-                        <div
-                            class="bg-gradient-to-r from-orange-50 to-pink-50 rounded-b-2xl p-4 flex justify-between items-center">
-                            <div class="text-sm text-gray-600">🔥 Hot deals this week!</div>
-                            <a href="#" class="text-orange-500 font-bold">View All →</a>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Ссылки -->
-                <div class="flex items-center gap-x-6 ml-8 text-sm font-semibold text-gray-700">
-                    <a href="#" class="hover:text-orange-500 transition">🏠 Home</a>
-                    <a href="#" class="hover:text-orange-500 transition">🔥 Deals</a>
-                    <a href="#" class="hover:text-orange-500 transition">⭐ Bestsellers</a>
-                    <a href="#" class="hover:text-orange-500 transition">✨ New Arrivals</a>
-                    <a href="#" class="hover:text-orange-500 transition">🏷️ Brands</a>
-                    <a href="#" class="hover:text-orange-500 transition">📝 Blog</a>
-                    <a href="#" class="hover:text-orange-500 transition">📞 Contact</a>
-                </div>
-
-                <div class="ml-auto flex items-center gap-x-3">
-                    <div class="bg-green-100 text-green-700 px-3 py-1.5 rounded-full text-xs font-bold">⭐ 4.9 ★★★★★
-                    </div>
-                    <a href="#" class="text-gray-600 hover:text-orange-500 text-sm font-semibold">📞 24/7 Support</a>
-                </div>
-            </div>
-        </nav>
     </div>
 </header>
 
@@ -229,7 +197,6 @@
         dropdown.classList.toggle('hidden');
     }
 
-    // Закрывать дропдаун при клике вне меню
     document.addEventListener('click', function (event) {
         const button = document.getElementById('user-menu-button');
         const dropdown = document.getElementById('user-dropdown');

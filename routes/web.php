@@ -1,5 +1,8 @@
 <?php
 
+use App\Http\Controllers\AdminOrderController;
+use App\Http\Controllers\BasketController;
+use App\Http\Controllers\OrderController;
 use App\Http\Controllers\BrandController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\HomeController;
@@ -197,3 +200,41 @@ Route::prefix('admin/users')->name('admin.users.')->group(function () {
         ->middleware(AdminMiddleware::class);
 });
 
+//BASKET CONTROLLER
+Route::prefix('basket')->name('basket.')->middleware('auth')->group(function () {
+    Route::get('', [BasketController::class, 'index'])
+        ->name('index');
+
+    Route::post('add', [BasketController::class, 'add'])
+        ->name('add');
+
+    Route::put('update/{itemId}', [BasketController::class, 'update'])
+        ->name('update');
+
+    Route::delete('remove/{itemId}', [BasketController::class, 'remove'])
+        ->name('remove');
+
+    Route::post('clear', [BasketController::class, 'clear'])
+        ->name('clear');
+
+    Route::post('checkout', [BasketController::class, 'checkout'])
+        ->name('checkout');
+});
+
+//ORDER CONTROLLER (user history)
+Route::prefix('my-orders')->name('my-orders.')->middleware('auth')->group(function () {
+    Route::get('', [OrderController::class, 'index'])
+        ->name('index');
+});
+
+//ADMIN ORDER CONTROLLER
+Route::prefix('admin/orders')->name('admin.orders.')->middleware(['auth', AdminMiddleware::class, CheckUserActive::class])->group(function () {
+    Route::get('', [AdminOrderController::class, 'index'])
+        ->name('index');
+
+    Route::get('{basket}', [AdminOrderController::class, 'show'])
+        ->name('show');
+
+    Route::delete('{basket}', [AdminOrderController::class, 'destroy'])
+        ->name('destroy');
+});
