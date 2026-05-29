@@ -202,22 +202,19 @@ Route::prefix('admin/users')->name('admin.users.')->group(function () {
 
 //BASKET CONTROLLER
 Route::prefix('basket')->name('basket.')->middleware('auth')->group(function () {
-    Route::get('', [BasketController::class, 'index'])
+    Route::get('', [App\Http\Controllers\BasketController::class, 'index'])
         ->name('index');
-
-    Route::post('add', [BasketController::class, 'add'])
+    Route::get('state', [App\Http\Controllers\BasketController::class, 'state'])
+        ->name('state');
+    Route::post('add', [App\Http\Controllers\BasketController::class, 'add'])
         ->name('add');
-
-    Route::put('update/{itemId}', [BasketController::class, 'update'])
+    Route::put('update/{itemId}', [App\Http\Controllers\BasketController::class, 'update'])
         ->name('update');
-
-    Route::delete('remove/{itemId}', [BasketController::class, 'remove'])
+    Route::delete('remove/{itemId}', [App\Http\Controllers\BasketController::class, 'remove'])
         ->name('remove');
-
-    Route::post('clear', [BasketController::class, 'clear'])
+    Route::post('clear', [App\Http\Controllers\BasketController::class, 'clear'])
         ->name('clear');
-
-    Route::post('checkout', [BasketController::class, 'checkout'])
+    Route::post('checkout', [App\Http\Controllers\BasketController::class, 'checkout'])
         ->name('checkout');
 });
 

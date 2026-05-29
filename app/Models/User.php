@@ -99,11 +99,11 @@ class User extends Authenticatable implements MustVerifyEmail
 
     public function activeBasket(): ?Basket
     {
-        return $this->basket()->where('status', 'pending')->latest()->first();
+        return $this->baskets()->where('status', 'pending')->latest()->first();
     }
 
     public function completedBaskets(): HasMany
     {
-        return $this->basket()->where('status', 'completed')->latest();
+        return $this->baskets()->where('status', 'completed')->latest();
     }
 }

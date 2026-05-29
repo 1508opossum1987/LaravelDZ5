@@ -1,34 +1,29 @@
-import 'bootstrap';
+console.log('bootstrap.js загружен - начало');
 
-/**
- * We'll load the axios HTTP library which allows us to easily issue requests
- * to our Laravel back-end. This library automatically handles sending the
- * CSRF token as a header based on the value of the "XSRF" token cookie.
- */
+import { initEcho } from './echo.js';
+import { initCartHandlers, showToast } from './cart.js';
 
-import axios from 'axios';
-window.axios = axios;
+console.log('bootstrap.js загружен - после импорта');
 
-window.axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
+// Выносим функции в глобальный объект для использования в HTML
+window.showToast = showToast;
 
-/**
- * Echo exposes an expressive API for subscribing to channels and listening
- * for events that are broadcast by Laravel. Echo and event broadcasting
- * allows your team to easily build robust real-time web applications.
- */
+document.addEventListener('DOMContentLoaded', () => {
+    console.log('DOM загружен');
 
-// import Echo from 'laravel-echo';
+    const userIdElement = document.querySelector('meta[name="user-id"]');
+    const userId = userIdElement ? userIdElement.getAttribute('content') : null;
 
-// import Pusher from 'pusher-js';
-// window.Pusher = Pusher;
+    console.log('userId из meta:', userId);
 
-// window.Echo = new Echo({
-//     broadcaster: 'pusher',
-//     key: import.meta.env.VITE_PUSHER_APP_KEY,
-//     cluster: import.meta.env.VITE_PUSHER_APP_CLUSTER ?? 'mt1',
-//     wsHost: import.meta.env.VITE_PUSHER_HOST ?? `ws-${import.meta.env.VITE_PUSHER_APP_CLUSTER}.pusher.com`,
-//     wsPort: import.meta.env.VITE_PUSHER_PORT ?? 80,
-//     wssPort: import.meta.env.VITE_PUSHER_PORT ?? 443,
-//     forceTLS: (import.meta.env.VITE_PUSHER_SCHEME ?? 'https') === 'https',
-//     enabledTransports: ['ws', 'wss'],
-// });
+    if (userId) {
+        initEcho(userId);
+    } else {
+        console.log('Echo: пользователь не авторизован');
+    }
+
+    // Инициализируем обработчики корзины
+    initCartHandlers();
+});
+
+console.log('bootstrap.js загружен - конец файла');

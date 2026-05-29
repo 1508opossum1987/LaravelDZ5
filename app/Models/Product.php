@@ -114,4 +114,21 @@ class Product extends Model
         $this->decrement('stock_quantity', $quantity);
         return true;
     }
+
+    public function getImageUrlAttribute(): string
+    {
+        if (!empty($this->img_path)) {
+
+            if (filter_var($this->img_path, FILTER_VALIDATE_URL)) {
+                return $this->img_path;
+            }
+
+            $localPath = public_path('storage/' . $this->img_path);
+            if (file_exists($localPath)) {
+                return asset('storage/' . $this->img_path);
+            }
+        }
+
+        return asset('images/no-image.png');
+    }
 }

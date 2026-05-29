@@ -2,44 +2,41 @@
 
 namespace App\Events;
 
-use Illuminate\Broadcasting\Channel;
+use App\Models\Notification;
 use Illuminate\Broadcasting\InteractsWithSockets;
-use Illuminate\Broadcasting\PresenceChannel;
 use Illuminate\Broadcasting\PrivateChannel;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 
-class BasketCompletedEvent implements ShouldBroadcast
+class OrderCreatedEvent implements ShouldBroadcast
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
     public function __construct(
-        public int $userId,
-        public int $basketId,
-        public float $totalSum
-    )
-    {
-        //
-    }
+        public Notification $notification
+    ) {}
 
     public function broadcastOn(): array
     {
         return [
-            new PrivateChannel("basket.{$this->userId}"),
+            new PrivateChannel('admin.notifications'),
         ];
     }
 
     public function broadcastAs(): string
     {
-        return 'basket.completed';
+        return 'order.created';
     }
 
     public function broadcastWith(): array
     {
         return [
-            'basket_id' => $this->basketId,
-            'total_sum' => $this->totalSum,
+            'id' => $this->notification->id,
+            'title' => $this->notification->title,
+            'message' => $this->notification->message,
+            'link' => $this->notification->link,
+            'created_at' => $this->notification->created_at->diffForHumans(),
         ];
     }
 }

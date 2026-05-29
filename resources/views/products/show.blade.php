@@ -11,13 +11,7 @@
         <div class="bg-gray-900 rounded-lg overflow-hidden">
             <div class="md:flex">
                 <div class="md:w-1/2">
-                    @if($product->img_path)
-                        <img src="{{ Storage::url($product->img_path) }}" alt="{{ $product->name }}" class="w-full h-full object-cover">
-                    @else
-                        <div class="w-full h-96 bg-gray-800 flex items-center justify-center">
-                            <span class="text-gray-600 text-lg">Нет изображения</span>
-                        </div>
-                    @endif
+                    <img src="{{ $product->image_url }}" alt="{{ $product->name }}" class="w-full h-full object-cover">
                 </div>
 
                 <div class="md:w-1/2 p-8">

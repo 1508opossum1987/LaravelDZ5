@@ -49,13 +49,7 @@
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                 @foreach($category->products as $product)
                     <div class="bg-gray-900 rounded-lg overflow-hidden shadow-lg">
-                        @if($product->img_path)
-                            <img src="{{ $product->img_path }}" alt="{{ $product->name }}" class="w-full h-48 object-cover">
-                        @else
-                            <div class="w-full h-48 bg-gray-800 flex items-center justify-center">
-                                <span class="text-gray-600">Нет фото</span>
-                            </div>
-                        @endif
+                        <img src="{{ $product->image_url }}" alt="{{ $product->name }}" class="w-full h-48 object-cover">
                         <div class="p-4">
                             <h3 class="text-white font-bold text-lg mb-2">{{ $product->name }}</h3>
                             <p class="text-gray-400 text-sm mb-3">{{ Str::limit($product->description, 100) }}</p>

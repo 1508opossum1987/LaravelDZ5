@@ -3,16 +3,19 @@
 namespace App\Http\Controllers;
 
 use App\Events\BasketCompletedEvent;
+use App\Events\BasketUpdateEvent;
+use App\Events\OrderCreatedEvent;
 use App\Http\Requests\Basket\AddToBasketRequest;
 use App\Http\Requests\Basket\UpdateBasketItemRequest;
 use App\Http\Requests\Basket\CheckoutRequest;
 use App\Models\Basket;
 use App\Models\BasketItem;
 use App\Models\Product;
-use Illuminate\Http\RedirectResponse;
+use App\Models\Notification;
+use App\Models\User;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\View\View;
-use App\Events\BasketUpdateEvent;
 
 class BasketController extends Controller
 {
@@ -36,7 +39,48 @@ class BasketController extends Controller
         ]);
     }
 
-    public function add(AddToBasketRequest $request): RedirectResponse
+    public function state(): JsonResponse
+    {
+        $user = Auth::user();
+        $activeBasket = $user->activeBasket();
+
+        if ($activeBasket) {
+            $activeBasket->load(['items.product']);
+
+            $items = [];
+            foreach ($activeBasket->items as $item) {
+                $price = $item->product->discount_price ?? $item->product->price;
+                $items[] = [
+                    'id' => $item->id,
+                    'product_id' => $item->product_id,
+                    'quantity' => $item->quantity,
+                    'subtotal' => $price * $item->quantity,
+                    'product' => [
+                        'id' => $item->product->id,
+                        'name' => $item->product->name,
+                        'price' => $price,
+                        'image_url' => $item->product->image_url,
+                    ],
+                ];
+            }
+
+            return response()->json([
+                'success' => true,
+                'total_items' => $activeBasket->totalItems(),
+                'total_sum' => $activeBasket->totalSum(),
+                'items' => $items,
+            ]);
+        }
+
+        return response()->json([
+            'success' => true,
+            'total_items' => 0,
+            'total_sum' => 0,
+            'items' => [],
+        ]);
+    }
+
+    public function add(AddToBasketRequest $request): JsonResponse
     {
         $user = Auth::user();
         $items = $request->input('items');
@@ -54,15 +98,17 @@ class BasketController extends Controller
             $product = Product::find($itemData['product_id']);
 
             if (!$product) {
-                return redirect()
-                    ->route('basket.index')
-                    ->with('error', 'Товар не найден!');
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Товар не найден!',
+                ]);
             }
 
             if (!$product->hasStock($itemData['quantity'])) {
-                return redirect()
-                    ->route('basket.index')
-                    ->with('error', "Недостаточно товара '{$product->name}' на складе! Доступно: {$product->stock_quantity}");
+                return response()->json([
+                    'success' => false,
+                    'message' => "Недостаточно товара '{$product->name}' на складе! Доступно: {$product->stock_quantity}",
+                ]);
             }
 
             $basketItem = BasketItem::where('basket_id', $activeBasket->id)
@@ -89,12 +135,13 @@ class BasketController extends Controller
             totalSum: $activeBasket->totalSum()
         ));
 
-        return redirect()
-            ->route('basket.index')
-            ->with('success', 'Товары успешно добавлены в корзину!');
+        return response()->json([
+            'success' => true,
+            'message' => 'Товары успешно добавлены в корзину!',
+        ]);
     }
 
-    public function update(UpdateBasketItemRequest $request, $itemId): RedirectResponse
+    public function update(UpdateBasketItemRequest $request, $itemId): JsonResponse
     {
         $user = Auth::user();
         $newQuantity = $request->input('quantity');
@@ -102,9 +149,10 @@ class BasketController extends Controller
         $activeBasket = $user->activeBasket();
 
         if (!$activeBasket) {
-            return redirect()
-                ->route('basket.index')
-                ->with('error', 'Корзина не найдена!');
+            return response()->json([
+                'success' => false,
+                'message' => 'Корзина не найдена!',
+            ]);
         }
 
         $basketItem = BasketItem::where('id', $itemId)
@@ -112,17 +160,19 @@ class BasketController extends Controller
             ->first();
 
         if (!$basketItem) {
-            return redirect()
-                ->route('basket.index')
-                ->with('error', 'Позиция в корзине не найдена!');
+            return response()->json([
+                'success' => false,
+                'message' => 'Позиция в корзине не найдена!',
+            ]);
         }
 
         $product = $basketItem->product;
 
         if (!$product->hasStock($newQuantity)) {
-            return redirect()
-                ->route('basket.index')
-                ->with('error', "Недостаточно товара '{$product->name}' на складе! Доступно: {$product->stock_quantity}");
+            return response()->json([
+                'success' => false,
+                'message' => "Недостаточно товара '{$product->name}' на складе! Доступно: {$product->stock_quantity}",
+            ]);
         }
 
         $basketItem->quantity = $newQuantity;
@@ -136,21 +186,23 @@ class BasketController extends Controller
             totalSum: $activeBasket->totalSum()
         ));
 
-        return redirect()
-            ->route('basket.index')
-            ->with('success', 'Количество товара успешно обновлено!');
+        return response()->json([
+            'success' => true,
+            'message' => 'Количество товара успешно обновлено!',
+        ]);
     }
 
-    public function remove($itemId): RedirectResponse
+    public function remove($itemId): JsonResponse
     {
         $user = Auth::user();
 
         $activeBasket = $user->activeBasket();
 
         if (!$activeBasket) {
-            return redirect()
-                ->route('basket.index')
-                ->with('error', 'Корзина не найдена!');
+            return response()->json([
+                'success' => false,
+                'message' => 'Корзина не найдена!',
+            ]);
         }
 
         $basketItem = BasketItem::where('id', $itemId)
@@ -158,9 +210,10 @@ class BasketController extends Controller
             ->first();
 
         if (!$basketItem) {
-            return redirect()
-                ->route('basket.index')
-                ->with('error', 'Позиция в корзине не найдена!');
+            return response()->json([
+                'success' => false,
+                'message' => 'Позиция в корзине не найдена!',
+            ]);
         }
 
         $basketItem->delete();
@@ -173,21 +226,23 @@ class BasketController extends Controller
             totalSum: $activeBasket->totalSum()
         ));
 
-        return redirect()
-            ->route('basket.index')
-            ->with('success', 'Товар успешно удален из корзины!');
+        return response()->json([
+            'success' => true,
+            'message' => 'Товар успешно удален из корзины!',
+        ]);
     }
 
-    public function clear(): RedirectResponse
+    public function clear(): JsonResponse
     {
         $user = Auth::user();
 
         $activeBasket = $user->activeBasket();
 
         if (!$activeBasket) {
-            return redirect()
-                ->route('basket.index')
-                ->with('error', 'Корзина не найдена!');
+            return response()->json([
+                'success' => false,
+                'message' => 'Корзина не найдена!',
+            ]);
         }
 
         BasketItem::where('basket_id', $activeBasket->id)->delete();
@@ -198,38 +253,42 @@ class BasketController extends Controller
             totalSum: 0
         ));
 
-        return redirect()
-            ->route('basket.index')
-            ->with('success', 'Корзина успешно очищена!');
+        return response()->json([
+            'success' => true,
+            'message' => 'Корзина успешно очищена!',
+        ]);
     }
 
-    public function checkout(CheckoutRequest $request): RedirectResponse
+    public function checkout(CheckoutRequest $request): JsonResponse
     {
         $user = Auth::user();
 
         $activeBasket = $user->activeBasket();
 
         if (!$activeBasket) {
-            return redirect()
-                ->route('basket.index')
-                ->with('error', 'Корзина не найдена!');
+            return response()->json([
+                'success' => false,
+                'message' => 'Корзина не найдена!',
+            ]);
         }
 
         $activeBasket->load(['items.product']);
 
         if ($activeBasket->items->isEmpty()) {
-            return redirect()
-                ->route('basket.index')
-                ->with('error', 'Корзина пуста! Добавьте товары перед оформлением.');
+            return response()->json([
+                'success' => false,
+                'message' => 'Корзина пуста! Добавьте товары перед оформлением.',
+            ]);
         }
 
         foreach ($activeBasket->items as $item) {
             $product = $item->product;
 
             if (!$product->hasStock($item->quantity)) {
-                return redirect()
-                    ->route('basket.index')
-                    ->with('error', "Недостаточно товара '{$product->name}' на складе! Доступно: {$product->stock_quantity}");
+                return response()->json([
+                    'success' => false,
+                    'message' => "Недостаточно товара '{$product->name}' на складе! Доступно: {$product->stock_quantity}",
+                ]);
             }
         }
 
@@ -252,8 +311,25 @@ class BasketController extends Controller
             totalSum: $activeBasket->totalSum()
         ));
 
-        return redirect()
-            ->route('my-orders.index')
-            ->with('success', 'Заказ успешно оформлен!');
+        $admins = User::where('role', 'admin')->get();
+
+        foreach ($admins as $admin) {
+            $notification = Notification::create([
+                'user_id' => $admin->id,
+                'basket_id' => $activeBasket->id,
+                'title' => 'Новый заказ!',
+                'message' => "Пользователь {$user->name} оформил заказ #{$activeBasket->id} на сумму {$activeBasket->totalSum()} ₽",
+                'link' => route('admin.orders.show', $activeBasket->id),
+                'is_read' => false,
+            ]);
+
+            broadcast(new OrderCreatedEvent($notification));
+        }
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Заказ успешно оформлен!',
+            'redirect' => route('my-orders.index'),
+        ]);
     }
 }

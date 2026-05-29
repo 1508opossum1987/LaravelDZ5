@@ -25,10 +25,8 @@
     </button>
 
     <!-- Изображение -->
-    <a href="#" class="block overflow-hidden bg-gray-50">
-        <img src="{{ $product->img_path ? asset('storage/' . $product->img_path) : '/images/notavailable.jpg' }}"
-             alt="{{ $product->name }}"
-             class="w-full h-64 object-contain p-6 transition-transform duration-500 group-hover:scale-110">
+    <a href="{{ route('products.show', $product) }}" class="block overflow-hidden bg-gray-50">
+        <img src="{{ $product->image_url }}" alt="{{ $product->name }}" class="w-full h-64 object-contain p-6 transition-transform duration-500 group-hover:scale-110">
     </a>
 
     <!-- Контент -->
@@ -44,7 +42,7 @@
         </div>
 
         <!-- Название -->
-        <a href="#" class="block">
+        <a href="{{ route('products.show', $product) }}" class="block">
             <h3 class="font-semibold text-gray-800 hover:text-cyan-600 transition line-clamp-2 min-h-[56px]">
                 {{ $product->name }}
             </h3>
@@ -90,7 +88,10 @@
 
         <!-- Кнопки -->
         <div class="mt-5 flex items-center gap-2">
-            <button class="flex-1 bg-gradient-to-r from-gray-900 to-gray-800 text-white font-semibold py-2.5 rounded-xl hover:from-cyan-600 hover:to-blue-600 transition-all duration-300 text-sm">
+            <button type="button"
+                    class="add-to-cart-btn w-full bg-gradient-to-r from-gray-900 to-gray-800 text-white font-semibold py-2.5 rounded-xl hover:from-cyan-600 hover:to-blue-600 transition-all duration-300 text-sm"
+                    data-product-id="{{ $product->id }}"
+                    data-quantity="1">
                 В корзину
             </button>
             <button class="w-10 h-10 bg-gray-100 rounded-xl hover:bg-cyan-100 transition-all duration-300 flex items-center justify-center group/quick">

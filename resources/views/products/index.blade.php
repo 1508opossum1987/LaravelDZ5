@@ -34,14 +34,8 @@
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                 @forelse($activeProducts as $product)
                     <div class="bg-gray-900 rounded-lg overflow-hidden shadow-lg hover:shadow-xl transition">
-                        @if($product->img_path)
-                            <img src="{{ Storage::url($product->img_path) }}" alt="{{ $product->name }}"
-                                 class="w-full h-48 object-cover">
-                        @else
-                            <div class="w-full h-48 bg-gray-800 flex items-center justify-center">
-                                <span class="text-gray-600">Нет фото</span>
-                            </div>
-                        @endif
+                        <img src="{{ $product->image_url }}" alt="{{ $product->name }}"
+                             class="w-full h-48 object-cover">
                         <div class="p-4">
                             <h2 class="text-white font-bold text-lg mb-2">{{ $product->name }}</h2>
                             <p class="text-gray-400 text-sm mb-3">{{ Str::limit($product->description, 80) }}</p>
@@ -65,7 +59,6 @@
                                             Редактировать
                                         </a>
 
-
                                         <form action="{{ route('products.destroy', $product) }}"
                                               method="POST"
                                               onsubmit="return confirm('Удалить товар «{{ $product->name }}»?')">
@@ -88,20 +81,14 @@
             </div>
         </div>
 
-        @if(auth()->user()->isAdmin()&&$trashedProducts->count() > 0)
+        @if(auth()->user()->isAdmin() && $trashedProducts->count() > 0)
             <div>
                 <h2 class="text-2xl font-bold text-white mb-4">Корзина (удаленные товары)</h2>
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                     @foreach($trashedProducts as $product)
                         <div class="bg-gray-800 rounded-lg overflow-hidden shadow-lg opacity-75">
-                            @if($product->img_path)
-                                <img src="{{ Storage::url($product->img_path) }}" alt="{{ $product->name }}"
-                                     class="w-full h-48 object-cover grayscale">
-                            @else
-                                <div class="w-full h-48 bg-gray-700 flex items-center justify-center">
-                                    <span class="text-gray-500">Нет фото</span>
-                                </div>
-                            @endif
+                            <img src="{{ $product->image_url }}" alt="{{ $product->name }}"
+                                 class="w-full h-48 object-cover grayscale">
                             <div class="p-4">
                                 <h2 class="text-gray-400 font-bold text-lg mb-2">{{ $product->name }}</h2>
                                 <p class="text-gray-500 text-sm mb-3">{{ Str::limit($product->description, 80) }}</p>

@@ -6,11 +6,32 @@ use Illuminate\Database\Eloquent\Model;
 
 class Notification extends Model
 {
-    protected $fillable =[
+    protected $fillable = [
         'user_id',
+        'basket_id',
         'title',
         'message',
-        'is_read',
-        'product_id'
+        'link',
+        'is_read'
     ];
+
+    protected $casts = [
+        'is_read' => 'boolean'
+    ];
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
+
+    public function basket()
+    {
+        return $this->belongsTo(Basket::class);
+    }
+
+    public function markAsRead()
+    {
+        $this->is_read = true;
+        $this->save();
+    }
 }
