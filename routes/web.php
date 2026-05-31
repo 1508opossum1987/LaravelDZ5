@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AdminOrderController;
 use App\Http\Controllers\BasketController;
+use App\Http\Controllers\LogController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\BrandController;
 use App\Http\Controllers\CategoryController;
@@ -200,14 +201,16 @@ Route::prefix('admin/users')->name('admin.users.')->group(function () {
         ->middleware(AdminMiddleware::class);
 });
 
+
+Route::post('basket/add', [App\Http\Controllers\BasketController::class, 'add'])
+    ->name('add');
+
 //BASKET CONTROLLER
 Route::prefix('basket')->name('basket.')->middleware('auth')->group(function () {
     Route::get('', [App\Http\Controllers\BasketController::class, 'index'])
         ->name('index');
     Route::get('state', [App\Http\Controllers\BasketController::class, 'state'])
         ->name('state');
-    Route::post('add', [App\Http\Controllers\BasketController::class, 'add'])
-        ->name('add');
     Route::put('update/{itemId}', [App\Http\Controllers\BasketController::class, 'update'])
         ->name('update');
     Route::delete('remove/{itemId}', [App\Http\Controllers\BasketController::class, 'remove'])
@@ -235,3 +238,5 @@ Route::prefix('admin/orders')->name('admin.orders.')->middleware(['auth', AdminM
     Route::delete('{basket}', [AdminOrderController::class, 'destroy'])
         ->name('destroy');
 });
+
+Route::get('logs', [LogController::class, 'index']);

@@ -75,6 +75,8 @@
                           class="absolute -top-1 -right-1 bg-gradient-to-r from-orange-500 to-pink-500 text-white text-[10px] font-bold w-5 h-5 flex items-center justify-center rounded-full">
                         @auth
                             {{ auth()->user()->activeBasket()?->totalItems() ?? 0 }}
+                        @elseif(!auth()->user() && !empty(get_basket_for_session()))
+                            {{  array_sum(get_basket_for_session()) }}
                         @else
                             0
                         @endauth

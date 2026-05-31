@@ -106,20 +106,16 @@ class CategoryController extends Controller
     {
         $categoryName = $category->name;
 
-        // Проверка на товары
         if ($category->products()->exists()) {
             return redirect()
                 ->route('categories.index')
                 ->with('error', "Нельзя удалить категорию '{$categoryName}', так как у нее есть товары!");
         }
 
-        // Получаем все ID подкатегорий рекурсивно
         $ids = $this->getAllChildIds($category->id);
 
-        // Добавляем ID текущей категории
         $ids[] = $category->id;
 
-        // Мягко удаляем все категории разом
         Category::whereIn('id', $ids)->delete();
 
         return redirect()
@@ -127,19 +123,14 @@ class CategoryController extends Controller
             ->with('success', "Категория '{$categoryName}' и все её подкатегории успешно удалены!");
     }
 
-    /**
-     * Получает ID всех подкатегорий рекурсивно
-     */
     private function getAllChildIds(int $parentId): array
     {
         $ids = [];
 
-        // Получаем прямых потомков
         $children = Category::where('parent_id', $parentId)->get();
 
         foreach ($children as $child) {
             $ids[] = $child->id;
-            // Рекурсивно получаем ID потомков потомков
             $ids = array_merge($ids, $this->getAllChildIds($child->id));
         }
 

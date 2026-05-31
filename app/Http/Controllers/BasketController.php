@@ -15,6 +15,8 @@ use App\Models\Notification;
 use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Cookie;
+use Illuminate\Support\Facades\Session;
 use Illuminate\View\View;
 
 class BasketController extends Controller
@@ -25,12 +27,32 @@ class BasketController extends Controller
 
         $activeBasket = $user->activeBasket();
 
-        if ($activeBasket) {
+        if ($activeBasket?->items->isNotEmpty()) {
             $activeBasket->load(['items.product']);
+        }else{
+            if (get_basket_for_session()){
+                if (!$activeBasket){
+                    $activeBasket = new Basket();
+                    $activeBasket->status = 'pending';
+                    $activeBasket->user_id = $user->id;
+                    $activeBasket->save();
+                }
+
+                foreach (get_basket_for_session() as $productId => $quantity) {
+                    BasketItem::query()->create([
+                        'basket_id' => $activeBasket->id,
+                        'product_id' => $productId,
+                        'quantity' => $quantity
+                    ]);
+                }
+
+                Session::forget('basket');
+            }
         }
 
         $totalSum = $activeBasket ? $activeBasket->totalSum() : 0;
         $totalItems = $activeBasket ? $activeBasket->totalItems() : 0;
+
 
         return view('basket.index', [
             'basket' => $activeBasket,
@@ -84,7 +106,30 @@ class BasketController extends Controller
     {
         $user = Auth::user();
         $items = $request->input('items');
+        $currentItem = current($request->input('items'));
 
+        if (!$user) {
+            if (!Session::get('basket')) {
+                Session::put('basket', json_encode(
+                    [
+                        $currentItem['product_id'] => $currentItem['quantity']
+                    ]
+                ));
+            } else {
+                $basket = json_decode(Session::get('basket'), true);
+                if (!isset($basket[$currentItem['product_id']])) {
+                    $basket[$currentItem['product_id']] = $currentItem['quantity'];
+                } else {
+                    $basket[$currentItem['product_id']] += $currentItem['quantity'];
+                }
+
+                Session::put('basket', json_encode($basket));
+            }
+            return response()->json([
+                'success' => true,
+                'message' => 'Товары успешно добавлены в корзину!',
+            ]);
+        }
         $activeBasket = $user->activeBasket();
 
         if (!$activeBasket) {
@@ -103,7 +148,6 @@ class BasketController extends Controller
                     'message' => 'Товар не найден!',
                 ]);
             }
-
             if (!$product->hasStock($itemData['quantity'])) {
                 return response()->json([
                     'success' => false,

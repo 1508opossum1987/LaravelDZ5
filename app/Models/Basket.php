@@ -7,6 +7,10 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
+/**
+ * @property int $user_id
+ * @property bool $status
+ */
 class Basket extends Model
 {
     use HasFactory;
@@ -63,5 +67,7 @@ class Basket extends Model
     {
         return $this->status === 'processing';
     }
+
+
 
 }
